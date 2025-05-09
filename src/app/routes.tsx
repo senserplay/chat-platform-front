@@ -4,6 +4,7 @@ import MainPage from "@/pages/MainPage/MainPage";
 import LoginPage from "@/pages/AuthPage/LoginPage";
 import RegisterPage from "@/pages/AuthPage/RegisterPage";
 import { AllChat } from "@/pages/AllChat/AllChat";
+import { ChatId } from "@/pages/ChatId/ChatId";
 
 export const router = createBrowserRouter([
   {
@@ -25,6 +26,10 @@ export const router = createBrowserRouter([
       {
         path: "chats",
         element: <AllChat />,
+      },
+      {
+        path: "chat/:chat_uuid",
+        element: <ChatId />,
       },
 
       //   {

@@ -3,9 +3,15 @@ import { useGetAllChats } from "./hooks/useGetAllChats";
 import { LoaderSpinner } from "@/features/LoaderSpinner";
 import { FaLock, FaUnlockAlt } from "react-icons/fa";
 import { MdModeEditOutline } from "react-icons/md";
+import { useNavigate } from "react-router-dom";
 
 export const UserChat = () => {
   const { data, isLoading, isError } = useGetAllChats();
+  const navigate=useNavigate()
+
+  const navigateToChat=(chat_uuid:string)=>{
+    navigate(`/chat/${chat_uuid}`)
+  }
   if (!data || isLoading || isError) return <LoaderSpinner />;
   console.log(data);
   return (
@@ -19,6 +25,8 @@ export const UserChat = () => {
           borderRadius={30}
           cursor={"pointer"}
           justifyContent={"space-between"}
+          key={item.uuid}
+          onClick={()=>navigateToChat(item.uuid)}
         >
           <Text fontSize={"xl"}>{item.title}</Text>
           <Flex>
