@@ -1,11 +1,4 @@
-import {
-  Flex,
-  Box,
-  Heading,
-  Text,
-  HStack,
-  Button,
-} from "@chakra-ui/react";
+import { Flex, Box, Heading, Text, HStack, Button } from "@chakra-ui/react";
 import { keyframes } from "@emotion/react";
 import { useNavigate } from "react-router-dom";
 
@@ -15,12 +8,21 @@ const fadeIn = keyframes`
 `;
 
 const MainPage = () => {
-    const navigate=useNavigate();
-    const navigateToLogin=()=>{
-        navigate('/login')
-    }
+  const navigate = useNavigate();
+  const navigateToLogin = () => {
+    navigate("/login");
+  };
+  const navigateToRegister = () => {
+    navigate("/register");
+  };
   return (
-    <Flex direction="column" justifyContent={'center'} align="center" p={{ base: "20px", md: "40px" }} h={'100vh'}>
+    <Flex
+      direction="column"
+      justifyContent={"center"}
+      align="center"
+      p={{ base: "20px", md: "40px" }}
+      h={"100vh"}
+    >
       <Box
         textAlign="center"
         mb="60px"
@@ -63,7 +65,7 @@ const MainPage = () => {
             bg="blue"
             borderRadius={30}
             _hover={{ bg: "blue/80" }}
-            onClick={navigateToLogin}
+            onClick={navigateToRegister}
           >
             Начать
           </Button>
@@ -76,6 +78,7 @@ const MainPage = () => {
             variant="outline"
             _hover={{ bg: "blue/5" }}
             borderRadius={30}
+            onClick={navigateToLogin}
           >
             У меня уже есть аккаунт
           </Button>

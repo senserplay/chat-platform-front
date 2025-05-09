@@ -2,6 +2,8 @@ import { createBrowserRouter } from "react-router-dom";
 import { Providers } from "./providers";
 import MainPage from "@/pages/MainPage/MainPage";
 import LoginPage from "@/pages/AuthPage/LoginPage";
+import RegisterPage from "@/pages/AuthPage/RegisterPage";
+import { AllChat } from "@/pages/AllChat/AllChat";
 
 export const router = createBrowserRouter([
   {
@@ -15,6 +17,14 @@ export const router = createBrowserRouter([
       {
         path: "login",
         element: <LoginPage />,
+      },
+      {
+        path: "register",
+        element: <RegisterPage />,
+      },
+      {
+        path: "chats",
+        element: <AllChat />,
       },
 
       //   {
