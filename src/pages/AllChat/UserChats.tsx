@@ -2,16 +2,16 @@ import { Flex, Text, useEditableStyles, VStack } from "@chakra-ui/react";
 import { useGetAllChats } from "./hooks/useGetAllChats";
 import { LoaderSpinner } from "@/features/LoaderSpinner";
 import { FaLock, FaUnlockAlt } from "react-icons/fa";
-import { MdModeEditOutline } from "react-icons/md";
 import { useNavigate } from "react-router-dom";
+import { EditDialog } from "./EditDialog";
 
 export const UserChat = () => {
   const { data, isLoading, isError } = useGetAllChats();
-  const navigate=useNavigate()
+  const navigate = useNavigate();
 
-  const navigateToChat=(chat_uuid:string)=>{
-    navigate(`/chat/${chat_uuid}`)
-  }
+  const navigateToChat = (chat_uuid: string) => {
+    navigate(`/chat/${chat_uuid}`);
+  };
   if (!data || isLoading || isError) return <LoaderSpinner />;
   console.log(data);
   return (
@@ -26,13 +26,25 @@ export const UserChat = () => {
           cursor={"pointer"}
           justifyContent={"space-between"}
           key={item.uuid}
-          onClick={()=>navigateToChat(item.uuid)}
+          flex={1}
+          _hover={{ shadow: "lg" }}
         >
-          <Text fontSize={"xl"}>{item.title}</Text>
+          <Text
+            fontSize={"xl"}
+            onClick={() => navigateToChat(item.uuid)}
+            flex={1}
+          >
+            {item.title}
+          </Text>
           <Flex>
-          <MdModeEditOutline  />
-          {item.is_open ? (
-              <Flex ml={3}>
+            <EditDialog
+              uuid={item.uuid}
+              titleChat={item.title}
+              is_open={item.is_open}
+            />
+
+            {item.is_open ? (
+              <Flex ml={3} flex={1}>
                 <FaUnlockAlt />
               </Flex>
             ) : (

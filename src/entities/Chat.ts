@@ -9,3 +9,8 @@ export interface ChatResponse {
 export interface CreateChatRequest {
   title: string;
 }
+export interface PatchChatRequest {
+  uuid: string;
+  title: string;
+  is_open: boolean;
+}

@@ -1,6 +1,7 @@
 import {
   Box,
   Button,
+  Checkbox,
   CloseButton,
   Dialog,
   Input,
@@ -39,33 +40,36 @@ export const CreateChatBtn = () => {
             Создать чат
           </Button>
         </Dialog.Trigger>
-        {isOpen&&<Portal>
-          <Dialog.Backdrop />
-          <Dialog.Positioner>
-            <Dialog.Content>
-              <Dialog.Header>
-                <Dialog.Title>Создание нового чата</Dialog.Title>
-              </Dialog.Header>
-              <Dialog.Body>
-                <Input
-                  placeholder="Введите название чата"
-                  onChange={(e) => setTitle(e.target.value)}
-                />
-              </Dialog.Body>
-              <Dialog.Footer>
-                <Dialog.ActionTrigger asChild>
-                  <Button variant="outline">Отмена</Button>
-                </Dialog.ActionTrigger>
-                <Button bg={"blue"} onClick={createChat}>
-                  Создать
-                </Button>
-              </Dialog.Footer>
-              <Dialog.CloseTrigger asChild>
-                <CloseButton size="sm" />
-              </Dialog.CloseTrigger>
-            </Dialog.Content>
-          </Dialog.Positioner>
-        </Portal>}
+        {isOpen && (
+          <Portal>
+            <Dialog.Backdrop />
+            <Dialog.Positioner>
+              <Dialog.Content>
+                <Dialog.Header>
+                  <Dialog.Title>Создание нового чата</Dialog.Title>
+                </Dialog.Header>
+                <Dialog.Body>
+                  <Input
+                    placeholder="Введите название чата"
+                    onChange={(e) => setTitle(e.target.value)}
+                  />
+                  
+                </Dialog.Body>
+                <Dialog.Footer>
+                  <Dialog.ActionTrigger asChild>
+                    <Button variant="outline">Отмена</Button>
+                  </Dialog.ActionTrigger>
+                  <Button bg={"blue"} onClick={createChat}>
+                    Создать
+                  </Button>
+                </Dialog.Footer>
+                <Dialog.CloseTrigger asChild>
+                  <CloseButton size="sm" />
+                </Dialog.CloseTrigger>
+              </Dialog.Content>
+            </Dialog.Positioner>
+          </Portal>
+        )}
       </Dialog.Root>
     </Box>
   );
