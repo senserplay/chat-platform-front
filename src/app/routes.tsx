@@ -6,6 +6,10 @@ import RegisterPage from "@/pages/AuthPage/RegisterPage";
 import { AllChat } from "@/pages/AllChat/AllChat";
 import { ChatId } from "@/pages/ChatId/ChatId";
 import { PersonalAccountPage } from "@/pages/PersonalAccountPage/PersonalAccountPage";
+import { InvitePage } from "@/pages/InvitePage/InvitePage";
+import ProtectedRoute from "@/shared/contexts/ProtectedRoute";
+import React from "react";
+import { MainLayout } from "@/layouts/mainLayout";
 
 export const router = createBrowserRouter([
   {
@@ -25,23 +29,18 @@ export const router = createBrowserRouter([
         element: <RegisterPage />,
       },
       {
-        path: "chats",
-        element: <AllChat />,
+        element: (
+          <ProtectedRoute>
+            <MainLayout />
+          </ProtectedRoute>
+        ),
+        children: [
+          { path: "chats", element: <AllChat /> },
+          { path: "chat/:chat_uuid", element: <ChatId /> },
+          { path: "invite/:token", element: <InvitePage /> },
+          { path: "personal-account", element: <PersonalAccountPage /> },
+        ],
       },
-      {
-        path: "chat/:chat_uuid",
-        element: <ChatId />,
-      },
-      {
-        path: "personal-account",
-        element: <PersonalAccountPage />,
-      },
-
-      //   {
-      //     path: 'personal-account',
-      //     element: <PersonalAccountPage />,
-      //     loader: protectedRouteLoader,
-      //   },
     ],
   },
 ]);

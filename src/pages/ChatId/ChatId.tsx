@@ -1,9 +1,10 @@
 import { useParams } from "react-router-dom";
 import { useGetChatId } from "./hooks/useGetChatId";
 import { LoaderSpinner } from "@/features/LoaderSpinner";
-import { Flex, Text, VStack } from "@chakra-ui/react";
+import {  Flex, HStack, Text, VStack } from "@chakra-ui/react";
 import { MessageChat } from "./MessageChat";
 import { InputPostMessage } from "./InputPostMessage";
+import { InviteModal } from "./InviteModal";
 
 export const ChatId = () => {
   const { chat_uuid } = useParams();
@@ -14,14 +15,29 @@ export const ChatId = () => {
 
   return (
     <VStack h={"100vh"}>
-      <Flex ml={0} w={'100%'}>
-        <Text fontSize={'4xl'} fontWeight={500}>{data.title}</Text>
-      </Flex>
-      <VStack w={"80%"} justifyContent={'space-between'} >
+      <HStack justifyContent={"space-between"} w={'100%'}>
         <Flex >
-        <MessageChat chat_uuid={chat_uuid} />
+          <Text fontSize={"4xl"} fontWeight={500}>
+            {data.title}
+          </Text>
         </Flex>
-        <Flex w={"60%"} position="fixed" bottom="10">
+      <InviteModal chat_uuid={chat_uuid}/>
+      </HStack>
+
+      <VStack w={"100%"} justifyContent={"space-between"}>
+        <MessageChat chat_uuid={chat_uuid} />
+
+        <Flex
+          w="60%"
+          position="fixed"
+          bottom="0"
+          left="50%"
+          transform="translateX(-50%)"
+          p={4}
+          bg="white"
+          borderTop="1px solid"
+          borderColor="gray.200"
+        >
           <InputPostMessage chat_uuid={chat_uuid} />
         </Flex>
       </VStack>

@@ -1,6 +1,5 @@
 import { useQuery } from "@tanstack/react-query";
 import { apiInstance } from "@/shared/api/apiConfig.ts";
-import { ChatResponse } from "@/entities/Chat";
 import { getToken } from "@/shared/services/authService";
 import { MessageResponse } from "@/entities/Message";
 
@@ -9,7 +8,7 @@ export const useGetMessageChat = (chatUuid:string) => {
   if (!token){
     throw new Error('Требуется авторизация')
   }
-  console.log(token)
+  
   return useQuery<MessageResponse[], Error>({
     queryKey: ["getMessageChat", chatUuid],
     enabled: !!chatUuid,
@@ -26,5 +25,6 @@ export const useGetMessageChat = (chatUuid:string) => {
         throw error;
       }
     },
+    
   });
 };
