@@ -4,16 +4,30 @@ import { LoaderSpinner } from "@/features/LoaderSpinner";
 import { FaLock, FaUnlockAlt } from "react-icons/fa";
 import { useNavigate } from "react-router-dom";
 import { EditDialog } from "./EditDialog";
+import { usePatchChat } from "./hooks/usePatchChat";
+import { useQueryClient } from "@tanstack/react-query";
 
 export const UserChat = () => {
   const { data, isLoading, isError } = useGetAllChats();
   const navigate = useNavigate();
+  const { mutateAsync: patchChat } = usePatchChat();
+  const queryClient = useQueryClient();
 
+  const toggleChatOpenState = async (uuid: string, title:string,is_open: boolean) => {
+    try {
+      await patchChat({ uuid,title,is_open });
+      await queryClient.invalidateQueries({ queryKey: ["getChats"] });
+      console.log('поменяли значение');
+      
+    } catch (error) {
+      console.error("Ошибка при переключении is_open", error);
+    }
+  };
   const navigateToChat = (chat_uuid: string) => {
     navigate(`/chat/${chat_uuid}`);
   };
   if (!data || isLoading || isError) return <LoaderSpinner />;
-  console.log(data);
+  console.log("вывод чатов", data);
   return (
     <VStack w={"100%"} mt={8}>
       {data.map((item) => (
@@ -43,15 +57,13 @@ export const UserChat = () => {
               is_open={item.is_open}
             />
 
-            {item.is_open ? (
-              <Flex ml={3} flex={1}>
-                <FaUnlockAlt />
-              </Flex>
-            ) : (
-              <Flex ml={3}>
-                <FaLock />
-              </Flex>
-            )}
+            <Flex
+              ml={3}
+              onClick={() => toggleChatOpenState(item.uuid,item.title, !item.is_open)}
+              cursor="pointer"
+            >
+              {item.is_open ? <FaUnlockAlt /> : <FaLock />}
+            </Flex>
           </Flex>
         </Flex>
       ))}

@@ -1,4 +1,3 @@
-import { CreateChatRequest, ChatResponse } from "@/entities/Chat";
 import { CreateMessage } from "@/entities/Message";
 import { apiInstance } from "@/shared/api/apiConfig";
 import { getToken } from "@/shared/services/authService";

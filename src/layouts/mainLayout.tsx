@@ -9,7 +9,7 @@ export const MainLayout = ({ children }: PropsWithChildren) => {
 
   return (
     <VStack>
-      {!isMainPage && <Header w={'90vh'}/>}
+      {!isMainPage && <Header/>}
       <Box w={'90vh'} >{children}</Box>
       
     </VStack>

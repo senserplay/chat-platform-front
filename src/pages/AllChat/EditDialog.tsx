@@ -24,7 +24,7 @@ type UseEditDialogProps = {
     const editChat = async ({ uuid,title,is_open }: UseEditDialogProps) => {
       try {
         await patchChat({ uuid,title,is_open });
-        await queryClient.invalidateQueries({ queryKey: ["editChat"] });
+        await queryClient.invalidateQueries({ queryKey: ["getChats"] });
         setIsOpen(false);
       } catch (err) {
         console.error("ошибка edit чата", err);
@@ -61,7 +61,7 @@ type UseEditDialogProps = {
                 </Dialog.ActionTrigger>
                 <Button
                   bg={"blue"}
-                  onClick={()=>editChat({uuid,title,is_open})}
+                  onClick={()=>editChat({uuid,title,is_open: isChatOpen})}
                 >
                   Редактировать
                 </Button>

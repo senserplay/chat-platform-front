@@ -11,17 +11,22 @@ export const Header = () => {
     removeToken();
     navigate("/");
   };
+  const navigateToMain = () => {
+    navigate("/chats");
+  };
   return (
     <HStack justifyContent={"space-between"} w={"100vh"} p={4}>
-      <Text fontWeight={500} fontSize={"2xl"}>
+      <Text fontWeight={500} fontSize={"2xl"} onClick={() => navigateToMain()}>
         Chat-platform
       </Text>
-      <Flex alignItems={'center'} gap={5}>
+      <Flex alignItems={"center"} gap={5}>
         <AvatarIcon
           onClick={() => RedirectToPersonalAccount()}
           cursor={"pointer"}
         />
-        <Button bg={'blue'} borderRadius={30} onClick={() => logout()}>Выйти</Button>
+        <Button bg={"blue"} borderRadius={30} onClick={() => logout()}>
+          Выйти
+        </Button>
       </Flex>
     </HStack>
   );
