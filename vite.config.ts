@@ -8,5 +8,6 @@ export default defineConfig({
   server: {
     host: '0.0.0.0', // <-- важно!
     port: 5173,
+    allowedHosts: ['chat-platform.amurushkin.ru'], // ✅ Разрешаем этот хост
   },
 })
