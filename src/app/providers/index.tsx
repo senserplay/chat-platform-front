@@ -4,6 +4,7 @@ import { queryClient } from "@/shared/api/apiConfig";
 import { system } from "@/shared/api/config/theme";
 import { AuthProvider } from "@/shared/contexts/AuthContext";
 import { Outlet } from "react-router-dom";
+import { Toaster } from "@/components/ui/toaster";
 
 export const Providers = () => {
   return (
@@ -12,6 +13,8 @@ export const Providers = () => {
         <AuthProvider>
           <Outlet />{" "}
         </AuthProvider>
+        <Toaster />
+
       </ChakraProvider>
     </QueryClientProvider>
   );

@@ -28,6 +28,8 @@ export const router = createBrowserRouter([
         path: "register",
         element: <RegisterPage />,
       },
+      { path: "invite/:token_invite", element: <InvitePage /> },
+
       {
         element: (
           <ProtectedRoute>
@@ -37,7 +39,6 @@ export const router = createBrowserRouter([
         children: [
           { path: "chats", element: <AllChat /> },
           { path: "chat/:chat_uuid", element: <ChatId /> },
-          { path: "invite/:token", element: <InvitePage /> },
           { path: "personal-account", element: <PersonalAccountPage /> },
         ],
       },

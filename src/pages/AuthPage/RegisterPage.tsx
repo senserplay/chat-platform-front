@@ -8,10 +8,15 @@ import {
   Stack,
   Field,
 } from "@chakra-ui/react";
-import { useNavigate } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 import { useAuth } from "@/shared/contexts/AuthContext";
+import { LocationState } from "@/entities/Invite";
 
 const RegisterPage: React.FC = () => {
+  const location = useLocation();
+  const { from } = (location.state as LocationState) || {};
+  const fromPath = from?.pathname ?? "/";
+
   const { register, error } = useAuth();
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
@@ -26,6 +31,7 @@ const RegisterPage: React.FC = () => {
 
       await register( username,password, email);
       console.log('регистрация успешна')
+      navigate('/chats', { state: { from: fromPath } })
     } catch (error: any) {
       console.error("reg error:", error);
     } finally {

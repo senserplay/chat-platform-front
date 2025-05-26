@@ -1,6 +1,7 @@
+import { LocationState } from "@/entities/Invite";
 import { Flex, Box, Heading, Text, HStack, Button } from "@chakra-ui/react";
 import { keyframes } from "@emotion/react";
-import { useNavigate } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 
 const fadeIn = keyframes`
   from { opacity: 0; transform: translateY(20px); }
@@ -8,12 +9,16 @@ const fadeIn = keyframes`
 `;
 
 const MainPage = () => {
+  const location = useLocation();
+  const { from } = (location.state as LocationState) || {};
+  const fromPath = from?.pathname ?? "/";
+
   const navigate = useNavigate();
   const navigateToLogin = () => {
-    navigate("/login");
+    navigate("/login", { state: { from: fromPath } });
   };
   const navigateToRegister = () => {
-    navigate("/register");
+    navigate("/register", { state: { from: fromPath } });
   };
   return (
     <Flex

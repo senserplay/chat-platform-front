@@ -8,23 +8,28 @@ import {
   Stack,
   Field,
 } from "@chakra-ui/react";
-import { useNavigate } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 import { useAuth } from "@/shared/contexts/AuthContext";
+import { LocationState } from "@/entities/Invite";
 
 const LoginPage: React.FC = () => {
+  const location = useLocation();
+  const { from } = (location.state as LocationState) || {};
+  const fromPath = from?.pathname ?? "/";
+
   const { login, error } = useAuth();
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
 
-  const onFinish = async (email: string, password: string ) => {
+  const onFinish = async (email: string, password: string) => {
     try {
       setLoading(true);
       console.log(email, password);
 
       await login(email, password);
-      navigate("/chats");
+      navigate("/chats", { state: { from: fromPath } });
     } catch (error: any) {
       console.error("Login error:", error);
     } finally {
@@ -90,7 +95,7 @@ const LoginPage: React.FC = () => {
         bg="blue"
         borderRadius={20}
         mb={5}
-        onClick={() => onFinish( email, password )}
+        onClick={() => onFinish(email, password)}
       >
         Войти
       </Button>

@@ -1,5 +1,12 @@
 import { useCreateInvite } from "@/features/hooks/useCreateInvite";
-import { Button, CloseButton, Dialog, HStack, Input, Portal } from "@chakra-ui/react";
+import {
+  Button,
+  CloseButton,
+  Dialog,
+  HStack,
+  Input,
+  Portal,
+} from "@chakra-ui/react";
 import { useState } from "react";
 
 export const InviteModal = ({ chat_uuid }: { chat_uuid: string }) => {
@@ -38,9 +45,18 @@ export const InviteModal = ({ chat_uuid }: { chat_uuid: string }) => {
             </Dialog.Body>
             <Dialog.Footer>
               <Dialog.ActionTrigger>
-                <HStack><Button variant="outline" borderRadius={30}>Отмена</Button>
-                <Button onClick={() => inviteUser(email)} colorPalette={'green'} borderRadius={30}>Сохранить</Button></HStack>
-                
+                <HStack>
+                  <Button variant="outline" borderRadius={30}>
+                    Отмена
+                  </Button>
+                  <Button
+                    onClick={() => inviteUser(email)}
+                    colorPalette={"green"}
+                    borderRadius={30}
+                  >
+                    Сохранить
+                  </Button>
+                </HStack>
               </Dialog.ActionTrigger>
             </Dialog.Footer>
             <Dialog.CloseTrigger asChild>
