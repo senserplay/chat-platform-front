@@ -8,8 +8,8 @@ export const Header = () => {
     navigate(`/personal-account`);
   };
   const logout = () => {
-    removeToken();
     navigate("/");
+    removeToken();
   };
   const navigateToMain = () => {
     navigate("/chats");

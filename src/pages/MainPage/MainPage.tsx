@@ -1,6 +1,8 @@
 import { LocationState } from "@/entities/Invite";
+import { useAuth } from "@/shared/contexts/AuthContext";
 import { Flex, Box, Heading, Text, HStack, Button } from "@chakra-ui/react";
 import { keyframes } from "@emotion/react";
+import { useEffect } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 
 const fadeIn = keyframes`
@@ -9,11 +11,19 @@ const fadeIn = keyframes`
 `;
 
 const MainPage = () => {
+  const auth = useAuth();
+  const isAuthenticated = auth.isAuthenticated;
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    if (isAuthenticated) {
+      navigate("/chats", { replace: true });
+    }
+  }, [isAuthenticated, navigate]);
   const location = useLocation();
   const { from } = (location.state as LocationState) || {};
   const fromPath = from?.pathname ?? "/";
 
-  const navigate = useNavigate();
   const navigateToLogin = () => {
     navigate("/login", { state: { from: fromPath } });
   };

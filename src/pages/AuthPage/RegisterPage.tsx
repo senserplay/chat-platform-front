@@ -11,32 +11,74 @@ import {
 import { useLocation, useNavigate } from "react-router-dom";
 import { useAuth } from "@/shared/contexts/AuthContext";
 import { LocationState } from "@/entities/Invite";
+import { clearInviteIntent, getInviteIntent } from "@/shared/services/invite-intent";
+import { useInviteUser } from "../InvitePage/hooks/useInviteUser";
+import { toaster } from "@/components/ui/toaster";
 
 const RegisterPage: React.FC = () => {
   const location = useLocation();
   const { from } = (location.state as LocationState) || {};
   const fromPath = from?.pathname ?? "/";
 
-  const { register, error } = useAuth();
+  const { register } = useAuth();
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [username, setUsername] = useState("");
+  const inviteToken = getInviteIntent();
+  const { mutateAsync: inviteUser } = useInviteUser(inviteToken || "");
 
-  const onFinish = async (username:string, email: string, password: string ) => {
+  const onFinish = async () => {
+    setLoading(true);
     try {
-      setLoading(true);
-      console.log('registration name', username, 'email',email, 'password',password);
+      await register(username, password, email);
+      if (inviteToken) {
+        try {
+          const res = await inviteUser();
+          clearInviteIntent();
+          navigate(`/chat/${res.chat_uuid}`);
+          return;
+        } catch (err: any) {
+          const status = err?.response?.status;
+          if (status === 403) {
+            toaster.create({
+              type: "error",
+              title:
+                "Вы не тот пользователь, кому предназначалось приглашение в чат",
+            });
+          } else if (status === 409) {
+            toaster.create({
+              type: "info",
+              title: "Вы уже участвуете в этом чате",
+            });
+            const chatUuid = err.response?.data?.chat_uuid;
+            if (chatUuid) {
+              navigate(`/chat/${chatUuid}`);
+              clearInviteIntent();
+              return;
+            }
+          } else {
+            toaster.create({
+              type: "error",
+              title: "Не удалось принять приглашение",
+            });
+          }
+          clearInviteIntent();
+          navigate("/chats");
+          return;
+        }
+      }
 
-      await register( username,password, email);
-      console.log('регистрация успешна')
-      navigate('/chats', { state: { from: fromPath } })
-    } catch (error: any) {
-      console.error("reg error:", error);
+      navigate(fromPath);
+    } catch (err: any) {
+      console.error("Registration error:", err);
     } finally {
       setLoading(false);
     }
+  };
+  const navigateToMain = () => {
+    navigate("/");
   };
 
   return (
@@ -108,7 +150,7 @@ const RegisterPage: React.FC = () => {
         bg="blue"
         borderRadius={20}
         mb={5}
-        onClick={() => onFinish( username,password,email )}
+        onClick={() => onFinish()}
       >
         Войти
       </Button>
@@ -116,8 +158,7 @@ const RegisterPage: React.FC = () => {
       <Text mt={4} color="gray.400">
         Еще нет аккаунта?{"      "}
         <ChakraLink
-          // as={Link} to="/register"
-          color="blue.600"
+onClick={navigateToMain}          color="blue.600"
         >
           Зарегистрироваться
         </ChakraLink>

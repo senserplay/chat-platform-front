@@ -8,7 +8,6 @@ import { ChatId } from "@/pages/ChatId/ChatId";
 import { PersonalAccountPage } from "@/pages/PersonalAccountPage/PersonalAccountPage";
 import { InvitePage } from "@/pages/InvitePage/InvitePage";
 import ProtectedRoute from "@/shared/contexts/ProtectedRoute";
-import React from "react";
 import { MainLayout } from "@/layouts/mainLayout";
 
 export const router = createBrowserRouter([
