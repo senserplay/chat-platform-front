@@ -6,47 +6,49 @@ import { API_URL } from "@/shared/api/apiConfig";
 export interface UseChatSocketResult {
   live: MessageResponse[];
   sendMessage: (text: string) => void;
-  status: 'connecting' | 'connected' | 'error';
+  status: "connecting" | "connected" | "error";
 }
 
 export function useChatSocket(
   chatUuid: string,
-  userId: number,
   enabled: boolean
 ): UseChatSocketResult {
   const queryClient = useQueryClient();
   const socketRef = useRef<WebSocket | null>(null);
   const [live, setLive] = useState<MessageResponse[]>([]);
-  const queryKey = ['getMessageChat', chatUuid];
+  const queryKey = ["getMessageChat", chatUuid];
 
   useEffect(() => {
-    if (!enabled || !chatUuid || !userId) return;
+    if (!enabled || !chatUuid) return;
     const token = getToken();
     if (!token) {
-      console.error('No auth token, WS not connected');
+      console.error("No auth token, WS not connected");
       return;
     }
 
     const ws = new WebSocket(
-      `${API_URL}/message/ws/${userId}/${chatUuid}?token=${token}`
+      `${API_URL}/message/ws/${chatUuid}?token=${token}`
     );
     socketRef.current = ws;
 
-    ws.onopen = () => console.log('WS connected, readyState =', ws.readyState);
-    ws.onerror = (e) => console.error('WS error:', e);
-    ws.onclose = (e) => console.log('WS closed:', e.code, e.reason, 'clean?', e.wasClean);
+    ws.onopen = () => console.log("WS connected, readyState =", ws.readyState);
+    ws.onerror = (e) => console.error("WS error:", e);
+    ws.onclose = (e) =>
+      console.log("WS closed:", e.code, e.reason, "clean?", e.wasClean);
 
     ws.onmessage = (event) => {
       try {
         const msg: MessageResponse = JSON.parse(event.data);
         // Avoid duplicates in live buffer
-        setLive((prev) => (prev.find((m) => m.id === msg.id) ? prev : [...prev, msg]));
+        setLive((prev) =>
+          prev.find((m) => m.id === msg.id) ? prev : [...prev, msg]
+        );
         // Update React Query cache
         queryClient.setQueryData<MessageResponse[]>(queryKey, (old = []) =>
           old.find((m) => m.id === msg.id) ? old : [...old, msg]
         );
       } catch (err) {
-        console.error('Failed to parse WS message', err);
+        console.error("Failed to parse WS message", err);
       }
     };
 
@@ -54,31 +56,37 @@ export function useChatSocket(
       ws.close();
       socketRef.current = null;
     };
-  }, [chatUuid, userId, enabled, queryClient]);
+  }, [chatUuid, enabled, queryClient]);
 
   const sendMessage = (text: string) => {
     const ws = socketRef.current;
     if (!ws || ws.readyState !== WebSocket.OPEN) {
-      console.error('WS not open');
+      console.error("WS not open");
       return;
     }
     const payload = {
       chat_uuid: chatUuid,
-      user_id: userId,
+
       text,
       created_at: new Date().toISOString(),
     };
     ws.send(JSON.stringify(payload));
     // Optimistic update in cache
-    const optimistic: MessageResponse = { ...payload, id: `temp-${Date.now()}` } as any;
-    queryClient.setQueryData<MessageResponse[]>(queryKey, (old = []) => [...old, optimistic]);
+    const optimistic: MessageResponse = {
+      ...payload,
+      id: `temp-${Date.now()}`,
+    } as any;
+    queryClient.setQueryData<MessageResponse[]>(queryKey, (old = []) => [
+      ...old,
+      optimistic,
+    ]);
   };
 
-  const status: UseChatSocketResult['status'] = socketRef.current
+  const status: UseChatSocketResult["status"] = socketRef.current
     ? socketRef.current.readyState === WebSocket.OPEN
-      ? 'connected'
-      : 'connecting'
-    : 'error';
+      ? "connected"
+      : "connecting"
+    : "error";
 
   return { live, sendMessage, status };
 }
@@ -162,5 +170,5 @@ export function useChatSocket(
 //     //   { ...payload, id: `temp-${Date.now()}` },
 //     // ]);
 //   };
-  
+
 //   return { sendMessage }}
