@@ -8,9 +8,12 @@ export const useInviteUser = (token_invite:string) => {
     mutationKey: ["inviteUser"],
     mutationFn: async () => {
       const token = getToken();
+      console.log('token', token)
       if (!token) {
         throw new Error("Требуется авторизация");
       }
+      console.log('token correct');
+      
       const response = await apiInstance.post(`/invite/accept/${token_invite}`, undefined, {
         headers: { Authorization: `Bearer ${token}` },
       });

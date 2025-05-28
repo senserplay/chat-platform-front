@@ -24,7 +24,7 @@ export const ChatId = () => {
       <InviteModal chat_uuid={chat_uuid}/>
       </HStack>
 
-      <VStack w={"100%"} justifyContent={"space-between"}>
+      <VStack  w={"100%"} justifyContent={"space-between"}>
         <MessageChat chat_uuid={chat_uuid} />
 
         <Flex

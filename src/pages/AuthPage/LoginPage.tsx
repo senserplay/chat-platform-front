@@ -30,7 +30,11 @@ const LoginPage: React.FC = () => {
   const [password, setPassword] = useState("");
   const inviteToken = getInviteIntent();
   const { mutateAsync: inviteUser } = useInviteUser(inviteToken || "");
+  console.log('ТУТ!!!!!!!!!!!',fromPath)
 
+  const navigateToRegister = () => {
+    navigate("/register");
+  };
   const onFinish = async (email: string, password: string) => {
     setLoading(true);
     try {
@@ -149,7 +153,12 @@ const LoginPage: React.FC = () => {
       >
         Войти
       </Button>
-
+      <Text mt={4} color="gray.400">
+        Еще нет аккаунта?{"      "}
+        <ChakraLink onClick={navigateToRegister} color="blue.600">
+          Зарегистрироваться
+        </ChakraLink>
+      </Text>
       <Text mt={2} color="gray.400">
         <ChakraLink onClick={navigateToMain} color="blue.600">
           Вернуться на главную

@@ -8,15 +8,16 @@ export const Header = () => {
     navigate(`/personal-account`);
   };
   const logout = () => {
-    navigate("/");
-    removeToken();
+     removeToken();
+     window.location.href = "/";
+
   };
   const navigateToMain = () => {
     navigate("/chats");
   };
   return (
     <HStack justifyContent={"space-between"} w={"100vh"} p={4}>
-      <Text fontWeight={500} fontSize={"2xl"} onClick={() => navigateToMain()}>
+      <Text fontWeight={500} fontSize={"2xl"} onClick={() => navigateToMain()} cursor={'pointer'}>
         Chat-platform
       </Text>
       <Flex alignItems={"center"} gap={5}>

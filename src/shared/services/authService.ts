@@ -107,12 +107,17 @@ export const register = async ({
       { username, password, email },
       {}
     );
+    if (response) {
+      saveToken(response.data.token);
+      setupAuthInterceptor();
+      
+    }
     console.log("token smth", response);
     return response.data;
   } catch (error) {
     if (axios.isAxiosError(error) && error.response) {
       throw new AuthError(
-        error.response.data.detail || "Ошибка регистрации",
+        JSON.stringify(error.response.data) || "Ошибка регистрации",
         error.response.status
       );
     }

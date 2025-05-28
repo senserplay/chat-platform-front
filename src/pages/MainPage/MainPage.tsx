@@ -16,8 +16,12 @@ const MainPage = () => {
   const navigate = useNavigate();
 
   useEffect(() => {
+    console.log('захожу в проверку авторизации');
+    
     if (isAuthenticated) {
       navigate("/chats", { replace: true });
+      console.log('пользователь авторизирован');
+
     }
   }, [isAuthenticated, navigate]);
   const location = useLocation();

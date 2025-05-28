@@ -11,7 +11,10 @@ import {
 import { useLocation, useNavigate } from "react-router-dom";
 import { useAuth } from "@/shared/contexts/AuthContext";
 import { LocationState } from "@/entities/Invite";
-import { clearInviteIntent, getInviteIntent } from "@/shared/services/invite-intent";
+import {
+  clearInviteIntent,
+  getInviteIntent,
+} from "@/shared/services/invite-intent";
 import { useInviteUser } from "../InvitePage/hooks/useInviteUser";
 import { toaster } from "@/components/ui/toaster";
 
@@ -21,6 +24,8 @@ const RegisterPage: React.FC = () => {
   const fromPath = from?.pathname ?? "/";
 
   const { register } = useAuth();
+  const { login } = useAuth();
+
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
   const [email, setEmail] = useState("");
@@ -29,10 +34,17 @@ const RegisterPage: React.FC = () => {
   const inviteToken = getInviteIntent();
   const { mutateAsync: inviteUser } = useInviteUser(inviteToken || "");
 
-  const onFinish = async () => {
+  const onFinish = async (
+    username: string,
+    email: string,
+    password: string
+  ) => {
     setLoading(true);
+    console.log(username,email,password)
     try {
-      await register(username, password, email);
+      await register(username,email, password);
+      await login( email, password );
+
       if (inviteToken) {
         try {
           const res = await inviteUser();
@@ -69,14 +81,16 @@ const RegisterPage: React.FC = () => {
           return;
         }
       }
-
-      navigate(fromPath);
+      else{
+      navigate(fromPath);}
+      
     } catch (err: any) {
       console.error("Registration error:", err);
     } finally {
       setLoading(false);
     }
   };
+  
   const navigateToMain = () => {
     navigate("/");
   };
@@ -138,7 +152,6 @@ const RegisterPage: React.FC = () => {
           />
           <Field.ErrorText>Введите пароль</Field.ErrorText>
         </Field.Root>
-        
       </Fieldset.Content>
 
       <Button
@@ -150,25 +163,33 @@ const RegisterPage: React.FC = () => {
         bg="blue"
         borderRadius={20}
         mb={5}
-        onClick={() => onFinish()}
+        onClick={() => {
+          if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+            toaster.create({
+              type: "error",
+              title: "Пожалуйста, введите корректный email",
+            });
+            return;
+          }
+        
+          if (!username.trim() || !password.trim()) {
+            toaster.create({
+              type: "error",
+              title: "Заполните все поля",
+            });
+            return;
+          }
+        
+          onFinish(username, email, password);
+        }}
       >
         Войти
       </Button>
 
-      <Text mt={4} color="gray.400">
-        Еще нет аккаунта?{"      "}
-        <ChakraLink
-onClick={navigateToMain}          color="blue.600"
-        >
-          Зарегистрироваться
-        </ChakraLink>
-      </Text>
+      
 
       <Text mt={2} color="gray.400">
-        <ChakraLink
-          // as={Link} to="/welcome"
-          color="blue.600"
-        >
+        <ChakraLink onClick={navigateToMain} color="blue.600">
           Вернуться на главную
         </ChakraLink>
       </Text>

@@ -1,4 +1,4 @@
-import { HStack, Input } from "@chakra-ui/react";
+import { HStack, Input, Textarea } from "@chakra-ui/react";
 import { usePostMessage } from "./hooks/usePostMessage";
 import { useQueryClient } from "@tanstack/react-query";
 import { useState } from "react";
@@ -22,11 +22,15 @@ export const InputPostMessage = ({ chat_uuid }: MessageChatProps) => {
   };
   return (
     <HStack w={'100%'}>
-    <Input
-      placeholder="Введите сообщение"
-      value={text}
-      onChange={(e) => setText(e.target.value)}
-    ></Input><FaCircleArrowRight color="blue" onClick={()=>postMessage()}/></HStack>
+    <Textarea
+        placeholder="Введите сообщение" 
+        value={text}
+        autoresize 
+        onChange={(e) => setText(e.target.value)}
+        resize="vertical"      
+        minH="50px"           
+        maxH="200px"           
+      /><FaCircleArrowRight cursor={'pointer'} size="32px" color="blue" onClick={()=>postMessage()}/></HStack>
 
   );
 };
