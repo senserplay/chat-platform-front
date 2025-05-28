@@ -6,19 +6,28 @@ import { useNavigate } from "react-router-dom";
 import { EditDialog } from "./EditDialog";
 import { usePatchChat } from "./hooks/usePatchChat";
 import { useQueryClient } from "@tanstack/react-query";
+import { useGetUser } from "@/features/hooks/useGetUser";
 
 export const UserChat = () => {
   const { data, isLoading, isError } = useGetAllChats();
+  const {
+    data: responseUser,
+    isLoading: isLoadingUser,
+    isError: isErrorUser,
+  } = useGetUser();
   const navigate = useNavigate();
   const { mutateAsync: patchChat } = usePatchChat();
   const queryClient = useQueryClient();
 
-  const toggleChatOpenState = async (uuid: string, title:string,is_open: boolean) => {
+  const toggleChatOpenState = async (
+    uuid: string,
+    title: string,
+    is_open: boolean
+  ) => {
     try {
-      await patchChat({ uuid,title,is_open });
+      await patchChat({ uuid, title, is_open });
       await queryClient.invalidateQueries({ queryKey: ["getChats"] });
-      console.log('поменяли значение');
-      
+      console.log("поменяли значение");
     } catch (error) {
       console.error("Ошибка при переключении is_open", error);
     }
@@ -26,7 +35,15 @@ export const UserChat = () => {
   const navigateToChat = (chat_uuid: string) => {
     navigate(`/chat/${chat_uuid}`);
   };
-  if (!data || isLoading || isError) return <LoaderSpinner />;
+  if (
+    !data ||
+    isLoading ||
+    isError ||
+    !responseUser ||
+    isLoadingUser ||
+    isErrorUser
+  )
+    return <LoaderSpinner />;
   console.log("вывод чатов", data);
   return (
     <VStack w={"100%"} mt={8}>
@@ -51,17 +68,23 @@ export const UserChat = () => {
             {item.title}
           </Text>
           <Flex>
-            <EditDialog
-              uuid={item.uuid}
-              titleChat={item.title}
-              is_open={item.is_open}
-            />
+            {responseUser.id === item.owner_id && (
+              <EditDialog
+                uuid={item.uuid}
+                titleChat={item.title}
+                is_open={item.is_open}
+              />
+            )}
 
             <Flex
               ml={3}
-              onClick={() => toggleChatOpenState(item.uuid,item.title, !item.is_open)}
-              cursor="pointer"
-            >
+              onClick={() => {
+                if (responseUser.id === item.owner_id) {
+                  toggleChatOpenState(item.uuid, item.title, !item.is_open);
+                }
+              }}
+              cursor={responseUser.id === item.owner_id ? "pointer" : "default"}
+              >
               {item.is_open ? <FaUnlockAlt /> : <FaLock />}
             </Flex>
           </Flex>

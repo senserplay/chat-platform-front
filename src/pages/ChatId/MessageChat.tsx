@@ -1,7 +1,6 @@
 import { LoaderSpinner } from "@/features/LoaderSpinner";
 import { useGetMessageChat } from "./hooks/useGetMessageChat";
 import { Flex, Text, VStack } from "@chakra-ui/react";
-import { useChatSocket } from "./hooks/useChatSocket";
 import { useGetUser } from "@/features/hooks/useGetUser";
 export type MessageChatProps = {
   chat_uuid: string;
@@ -14,9 +13,6 @@ export const MessageChat = ({ chat_uuid }: MessageChatProps) => {
   } = useGetUser();
 
   const { data, isLoading, isError } = useGetMessageChat(chat_uuid || "");
-  const shouldConnect = !!data && !isLoading && !isError && !!responseUser;
-  useChatSocket(chat_uuid, responseUser?.id ?? 0, shouldConnect);
-
 
   if (
     !data ||
@@ -27,9 +23,10 @@ export const MessageChat = ({ chat_uuid }: MessageChatProps) => {
     isErrorUser
   )
     return <LoaderSpinner />;
-    const sortedMessages = [...data].sort((a, b) =>
+  const sortedMessages = [...data].sort(
+    (a, b) =>
       new Date(a.created_at).getTime() - new Date(b.created_at).getTime()
-    );
+  );
   console.log("дернули /message", data);
   return (
     <VStack
