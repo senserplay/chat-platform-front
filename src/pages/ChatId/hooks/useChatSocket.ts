@@ -1,17 +1,30 @@
-import { useEffect } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useQueryClient } from "@tanstack/react-query";
 import { getToken } from "@/shared/services/authService";
 import { MessageResponse } from "@/entities/Message";
-import { API_URL, WS_URL } from "@/shared/api/apiConfig";
-import { useGetUser } from "@/features/hooks/useGetUser";
+import { API_URL } from "@/shared/api/apiConfig";
 
 export const useChatSocket = (
   chatUuid: string,
   user_id: number,
   enabled: boolean
-) => {
+)=> {
   const queryClient = useQueryClient();
   const queryKey = ["getMessageChat", chatUuid];
+  // const sendMessage = (text: string) => {
+  //   const socketRef = useRef<WebSocket | null>(null);
+
+  //   if (!socketRef.current || socketRef.current.readyState !== WebSocket.OPEN) return;
+  //   const payload = { chatUuid, user_id, text, created_at: new Date().toISOString() };
+  //   socketRef.current.send(JSON.stringify(payload));
+  //   // оптимистично пишем в кеш
+  //   queryClient.setQueryData<MessageResponse[]>(queryKey, old => [
+  //     ...(old||[]),
+  //     { ...payload, id: `temp-${Date.now()}` },
+  //   ]);
+  // };
+  const socketRef = useRef<WebSocket | null>(null);
+  const [live, setLive] = useState<MessageResponse[]>([]);
 
   useEffect(() => {
     if (!enabled||!chatUuid || !user_id) return;
@@ -29,16 +42,22 @@ export const useChatSocket = (
       const ws = new WebSocket(
         `${API_URL}/message/ws/${user_id}/${chatUuid}?token=${token}`
       );
+      socketRef.current = ws;
 
       ws.onmessage = (event) => {
-        const newMsg: MessageResponse = JSON.parse(event.data);
-        const queryKey: [string, string] = ["getMessageChat", newMsg.chat_uuid];
-        console.log("newMsg", newMsg);
-        queryClient.setQueryData<MessageResponse[]>(queryKey, (old = []) => {
-          // если вдруг дубли, фильтруем
-          if (old.find((m) => m.id === newMsg.id)) return old;
-          return [...old, newMsg];
-        });
+        const msg: MessageResponse = JSON.parse(event.data);
+        const queryKey: [string, string] = ["getMessageChat", msg.chat_uuid];
+        console.log("newMsg", msg);
+        // queryClient.setQueryData<MessageResponse[]>(queryKey, (old = []) => {
+        //   // если вдруг дубли, фильтруем
+        //   if (old.find((m) => m.id === newMsg.id)) return old;
+        //   return [...old, newMsg];
+        // });
+        setLive(prev => prev.find(m=>m.id===msg.id) ? prev : [...prev, msg]);
+      // **и** пушим в кеш, чтобы useGetMessageChat.data тоже обновился
+      queryClient.setQueryData(queryKey, (old: MessageResponse[] = []) =>
+        old.find(m=>m.id===msg.id) ? old : [...old, msg]
+      );
       };
       ws.onopen = () => console.log("WS opened, readyState =", ws.readyState);
 
@@ -53,5 +72,5 @@ export const useChatSocket = (
     } catch (err) {
       console.error("Failed to construct WebSocket:", err);
     }
-  }, [chatUuid, user_id,enabled, queryClient]);
+  }, [chatUuid, user_id,enabled, queryClient ]);
 }; 

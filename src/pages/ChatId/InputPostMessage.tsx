@@ -13,7 +13,7 @@ export const InputPostMessage = ({ chat_uuid }: MessageChatProps) => {
   const postMessage = async () => {
     try {
       await postNewMessage({ chat_uuid, text });
-      await queryClient.invalidateQueries({ queryKey: ["createMessage"] });
+      await queryClient.invalidateQueries({ queryKey: ["getMessageChat", chat_uuid] });
       console.log("создали сообщение");
       setText('')
     } catch (err) {
