@@ -1,4 +1,4 @@
-import { Flex, Text, useEditableStyles, VStack } from "@chakra-ui/react";
+import { Flex, Text, VStack } from "@chakra-ui/react";
 import { useGetAllChats } from "./hooks/useGetAllChats";
 import { LoaderSpinner } from "@/features/LoaderSpinner";
 import { FaLock, FaUnlockAlt } from "react-icons/fa";

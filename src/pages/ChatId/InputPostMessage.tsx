@@ -1,4 +1,4 @@
-import { HStack, Input, Textarea } from "@chakra-ui/react";
+import { HStack, Textarea } from "@chakra-ui/react";
 import { usePostMessage } from "./hooks/usePostMessage";
 import { useQueryClient } from "@tanstack/react-query";
 import { useState } from "react";

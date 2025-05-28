@@ -27,7 +27,7 @@ export const CreateChatBtn = () => {
     }
   };
   return (
-    <Box justifyContent={"start"}>
+    <Box justifyContent={"start"} alignItems={'start'}>
       <Dialog.Root>
         <Dialog.Trigger asChild>
           <Button
