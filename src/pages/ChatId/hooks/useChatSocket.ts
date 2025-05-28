@@ -1,9 +1,8 @@
-import { useEffect, useRef, useState, useCallback, useMemo } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useQueryClient } from "@tanstack/react-query";
 import { getToken } from "@/shared/services/authService";
 import { MessageResponse } from "@/entities/Message";
 import { API_URL } from "@/shared/api/apiConfig";
-
 export interface UseChatSocketResult {
   live: MessageResponse[];
   sendMessage: (text: string) => void;
@@ -17,129 +16,77 @@ export function useChatSocket(
   const queryClient = useQueryClient();
   const socketRef = useRef<WebSocket | null>(null);
   const [live, setLive] = useState<MessageResponse[]>([]);
-  const [status, setStatus] = useState<UseChatSocketResult["status"]>("connecting");
-  const reconnectTimeoutRef = useRef<number | undefined>(undefined);
-  const queryKey = useMemo(() => ["getMessageChat", chatUuid], [chatUuid]);
+  const queryKey = ["getMessageChat", chatUuid];
 
-  const connect = useCallback(() => {
+  useEffect(() => {
     if (!enabled || !chatUuid) return;
-    
     const token = getToken();
     if (!token) {
       console.error("No auth token, WS not connected");
-      setStatus("error");
       return;
     }
 
-    try {
-      const ws = new WebSocket(
-        `${API_URL}/message/ws/${chatUuid}?token=${token}`
-      );
-      socketRef.current = ws;
+    const ws = new WebSocket(
+      `${API_URL}/message/ws/${chatUuid}?token=${token}`
+    );
+    socketRef.current = ws;
 
-      ws.onopen = () => {
-        console.log("WS connected, readyState =", ws.readyState);
-        setStatus("connected");
-      };
+    ws.onopen = () => console.log("WS connected, readyState =", ws.readyState);
+    ws.onerror = (e) => console.error("WS error:", e);
+    ws.onclose = (e) =>
+      console.log("WS closed:", e.code, e.reason, "clean?", e.wasClean);
 
-      ws.onerror = (e) => {
-        console.error("WS error:", e);
-        setStatus("error");
-      };
-
-      ws.onclose = (e) => {
-        console.log("WS closed:", e.code, e.reason, "clean?", e.wasClean);
-        setStatus("error");
-        socketRef.current = null;
-        
-        // Попытка переподключения через 3 секунды
-        reconnectTimeoutRef.current = window.setTimeout(() => {
-          console.log("Attempting to reconnect...");
-          connect();
-        }, 3000);
-      };
-
-      ws.onmessage = (event) => {
-        try {
-          // Проверяем, является ли входящее сообщение строкой
-          const data = typeof event.data === 'string' ? JSON.parse(event.data) : event.data;
-          const msg: MessageResponse = typeof data === 'string' ? JSON.parse(data) : data;
-          
-          console.log("Received message:", msg);
-
-          if (!msg || !msg.id) {
-            console.error("Invalid message format:", msg);
-            return;
-          }
-
-          // Avoid duplicates in live buffer
-          setLive((prev) =>
-            prev.find((m) => m.id === msg.id) ? prev : [...prev, msg]
-          );
-          // Update React Query cache
-          queryClient.setQueryData<MessageResponse[]>(queryKey, (old = []) =>
-            old.find((m) => m.id === msg.id) ? old : [...old, msg]
-          );
-        } catch (err) {
-          if (err instanceof Error) {
-            console.error("Failed to parse WS message", err.message, "Raw data:", event.data);
-          } else {
-            console.error("Failed to parse WS message", String(err), "Raw data:", event.data);
-          }
-        }
-      };
-    } catch (err) {
-      if (err instanceof Error) {
-        console.error("Failed to create WebSocket connection:", err.message);
-      } else {
-        console.error("Failed to create WebSocket connection:", String(err));
-      }
-      setStatus("error");
-    }
-  }, [chatUuid, enabled, queryClient, queryKey]);
-
-  useEffect(() => {
-    connect();
-
-    return () => {
-      if (reconnectTimeoutRef.current) {
-        window.clearTimeout(reconnectTimeoutRef.current);
-      }
-      if (socketRef.current) {
-        socketRef.current.close();
-        socketRef.current = null;
+    ws.onmessage = (event) => {
+      try {
+        const msg: MessageResponse = JSON.parse(event.data);
+        // Avoid duplicates in live buffer
+        setLive((prev) =>
+          prev.find((m) => m.id === msg.id) ? prev : [...prev, msg]
+        );
+        // Update React Query cache
+        queryClient.setQueryData<MessageResponse[]>(queryKey, (old = []) =>
+          old.find((m) => m.id === msg.id) ? old : [...old, msg]
+        );
+      } catch (err) {
+        console.error("Failed to parse WS message", err);
       }
     };
-  }, [connect]);
 
-  const sendMessage = useCallback((text: string) => {
+    return () => {
+      ws.close();
+      socketRef.current = null;
+    };
+  }, [chatUuid, enabled, queryClient]);
+
+  const sendMessage = (text: string) => {
     const ws = socketRef.current;
     if (!ws || ws.readyState !== WebSocket.OPEN) {
-      console.error("WS not open, attempting to reconnect...");
-      connect();
+      console.error("WS not open");
       return;
     }
     const payload = {
       chat_uuid: chatUuid,
+
       text,
       created_at: new Date().toISOString(),
     };
     ws.send(JSON.stringify(payload));
-    
     // Optimistic update in cache
     const optimistic: MessageResponse = {
-      id: Date.now(), // Используем timestamp как временный числовой id
-      user_id: 0, // Временный ID, будет заменен реальным после ответа сервера
-      chat_uuid: chatUuid,
-      text,
-      created_at: new Date().toISOString(),
-    };
-
+      ...payload,
+      id: `temp-${Date.now()}`,
+    } as any;
     queryClient.setQueryData<MessageResponse[]>(queryKey, (old = []) => [
       ...old,
       optimistic,
     ]);
-  }, [chatUuid, connect, queryClient, queryKey]);
+  };
+
+  const status: UseChatSocketResult["status"] = socketRef.current
+    ? socketRef.current.readyState === WebSocket.OPEN
+      ? "connected"
+      : "connecting"
+    : "error";
 
   return { live, sendMessage, status };
 }
