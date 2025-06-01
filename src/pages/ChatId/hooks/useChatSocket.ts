@@ -41,11 +41,11 @@ export function useChatSocket(
         const msg: MessageResponse = JSON.parse(event.data);
         // Avoid duplicates in live buffer
         setLive((prev) =>
-          prev.find((m) => m.id === msg.id) ? prev : [...prev, msg]
+          prev.find((m) => m.message.id === msg.message.id) ? prev : [...prev, msg]
         );
         // Update React Query cache
         queryClient.setQueryData<MessageResponse[]>(queryKey, (old = []) =>
-          old.find((m) => m.id === msg.id) ? old : [...old, msg]
+          old.find((m) => m.message.id === msg.message.id) ? old : [...old, msg]
         );
       } catch (err) {
         console.error("Failed to parse WS message", err);

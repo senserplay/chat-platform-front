@@ -1,4 +1,3 @@
-// components/ActiveChatsChart.tsx
 import React from "react";
 import {
   Chart as ChartJS,
@@ -16,7 +15,6 @@ import { Line } from "react-chartjs-2";
 import { Box, Spinner, Text, Heading, Center } from "@chakra-ui/react";
 import { useStatisticActive } from "@/features/hooks/useStatisticActive";
 
-// Регистрируем плагины Chart.js
 ChartJS.register(
   CategoryScale,
   LinearScale,
@@ -57,7 +55,6 @@ export const ActiveStatistic: React.FC = () => {
     );
   }
 
-  // Предполагаем, что Statistic — это Record<string, number>
   const stats = data as Record<string, number>;
 
   if (!stats || Object.keys(stats).length === 0) {

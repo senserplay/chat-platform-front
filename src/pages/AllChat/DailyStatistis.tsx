@@ -1,4 +1,3 @@
-// components/DailyMessagesChart.tsx
 import React from "react";
 import {
   Chart as ChartJS,
@@ -56,7 +55,6 @@ export const DailyMessagesChart: React.FC = () => {
     );
   }
 
-  // теперь data — это Record<string,number>
   if (!data || Object.keys(data).length === 0) {
     return (
       <Center py={10}>
@@ -65,7 +63,6 @@ export const DailyMessagesChart: React.FC = () => {
     );
   }
 
-  // разбиваем на метки и значения
   const labels = Object.keys(data);
   const values = Object.values(data);
 

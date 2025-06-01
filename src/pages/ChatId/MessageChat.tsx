@@ -25,7 +25,8 @@ export const MessageChat = ({ chat_uuid }: MessageChatProps) => {
     return <LoaderSpinner />;
   const sortedMessages = [...data].sort(
     (a, b) =>
-      new Date(a.created_at).getTime() - new Date(b.created_at).getTime()
+      new Date(a.message.created_at).getTime() -
+      new Date(b.message.created_at).getTime()
   );
   console.log("дернули /message", data);
   return (
@@ -38,23 +39,36 @@ export const MessageChat = ({ chat_uuid }: MessageChatProps) => {
       flex="1"
     >
       {sortedMessages.map((message) => {
-        const isOwn = message.user_id === responseUser.id;
+        const isOwn = message.message.user_id === responseUser.id;
         return (
           <Flex
             justifyContent={isOwn ? "flex-end" : "flex-start"}
-            key={message.id}
+            key={message.message.id}
             w={"100%"}
           >
-            <Flex
-              mb={5}
-              bg={"blue.100"}
-              p={5}
-              borderRadius={30}
-              maxW="70%"
-              boxShadow="2px 2px 7px rgba(0, 0, 0, 0.15)"
-            >
-              <Text>{message.text}</Text>
-            </Flex>
+            {" "}
+            <VStack w={"100%"}>
+              <Flex
+                justifyContent={isOwn ? "flex-end" : "flex-start"}
+                w={"100%"}
+              >
+                {message.username}
+              </Flex>
+              <Flex w={'100%'} 
+                justifyContent={isOwn ? "flex-end" : "flex-start"}
+                >
+                <Flex
+                  mb={5}
+                  bg={"blue.100"}
+                  p={5}
+                  borderRadius={30}
+                  maxW="70%"
+                  boxShadow="2px 2px 7px rgba(0, 0, 0, 0.15)"
+                >
+                  <Text>{message.message.text}</Text>
+                </Flex>
+              </Flex>
+            </VStack>
           </Flex>
         );
       })}
