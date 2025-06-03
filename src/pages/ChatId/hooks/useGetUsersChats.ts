@@ -9,7 +9,7 @@ export const useGetUsersChats = (chatUuid:string) => {
     throw new Error('Требуется авторизация')
   }
   console.log(token)
-  return useQuery<UsersInChatResponse, Error>({
+  return useQuery<UsersInChatResponse[], Error>({
     queryKey: ["getUsersChat", chatUuid],
     enabled: !!chatUuid,
 
