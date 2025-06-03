@@ -75,7 +75,7 @@ useEffect(() => {
           >
             {status === "error" && (
         <Box
-          w="100%"
+          w={"100%"}
           p={4}
           bg="orange.100"
           color="orange.800"

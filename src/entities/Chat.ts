@@ -14,3 +14,11 @@ export interface PatchChatRequest {
   title: string;
   is_open: boolean;
 }
+export interface UsersInChatResponse{
+  id: number;
+  username: string;
+  password: string;
+  email: string;
+  created_at: string; 
+  updated_at: string; 
+}

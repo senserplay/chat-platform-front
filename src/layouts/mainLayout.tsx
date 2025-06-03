@@ -11,7 +11,7 @@ export const MainLayout = () => {
     <VStack>
       {isHeader && <Header />}
       <Box w={"90vh"}>
-        {" "}
+        
         <Outlet />
       </Box>
     </VStack>
