@@ -2,6 +2,13 @@ import { createBrowserRouter } from "react-router-dom";
 import { Providers } from "./providers";
 import MainPage from "@/pages/MainPage/MainPage";
 import LoginPage from "@/pages/AuthPage/LoginPage";
+import RegisterPage from "@/pages/AuthPage/RegisterPage";
+import { AllChat } from "@/pages/AllChat/AllChat";
+import { ChatId } from "@/pages/ChatId/ChatId";
+import { PersonalAccountPage } from "@/pages/PersonalAccountPage/PersonalAccountPage";
+import { InvitePage } from "@/pages/InvitePage/InvitePage";
+import ProtectedRoute from "@/shared/contexts/ProtectedRoute";
+import { MainLayout } from "@/layouts/mainLayout";
 
 export const router = createBrowserRouter([
   {
@@ -16,12 +23,24 @@ export const router = createBrowserRouter([
         path: "login",
         element: <LoginPage />,
       },
+      {
+        path: "register",
+        element: <RegisterPage />,
+      },
+      { path: "invite/:token_invite", element: <InvitePage /> },
 
-      //   {
-      //     path: 'personal-account',
-      //     element: <PersonalAccountPage />,
-      //     loader: protectedRouteLoader,
-      //   },
+      {
+        element: (
+          <ProtectedRoute>
+            <MainLayout />
+          </ProtectedRoute>
+        ),
+        children: [
+          { path: "chats", element: <AllChat /> },
+          { path: "chat/:chat_uuid", element: <ChatId /> },
+          { path: "personal-account", element: <PersonalAccountPage /> },
+        ],
+      },
     ],
   },
 ]);

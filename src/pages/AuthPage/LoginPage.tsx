@@ -1,51 +1,113 @@
 import React, { useState } from "react";
 import {
-  Flex,
-  Box,
-  Heading,
-  
   Input,
-  InputGroup,
   Button,
-  Alert,
   Text,
   Link as ChakraLink,
-  AlertDescription,
   Fieldset,
   Stack,
   Field,
 } from "@chakra-ui/react";
-// import { useAuth } from "@/shared/contexts/AuthContext";
-import { useNavigate } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
+import { useAuth } from "@/shared/contexts/AuthContext";
+import { LocationState } from "@/entities/Invite";
+import {
+  clearInviteIntent,
+  getInviteIntent,
+} from "@/shared/services/invite-intent";
+import { toaster } from "@/components/ui/toaster";
+import { useInviteUser } from "../InvitePage/hooks/useInviteUser";
 
 const LoginPage: React.FC = () => {
-//   const { login, error } = useAuth();
-//   const [loading, setLoading] = useState(false);
-//   const navigate = useNavigate();
-const [username, setUsername] = useState('');
-  const [password, setPassword] = useState('');
+  const location = useLocation();
+  const { from } = (location.state as LocationState) || {};
+  const fromPath = from?.pathname ?? "/";
 
+  const { login } = useAuth();
+  const [loading, setLoading] = useState(false);
+  const navigate = useNavigate();
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const inviteToken = getInviteIntent();
+  const { mutateAsync: inviteUser } = useInviteUser(inviteToken || "");
+  console.log('ТУТ!!!!!!!!!!!',fromPath)
 
-//   const onFinish = async (values: { username: string; password: string }) => {
-//     try {
-//       setLoading(true);
-//       await login(values.username, values.password);
-//       message.success("Вход выполнен успешно");
-//       navigate("/");
-//     } catch (error: any) {
-//       console.error("Login error:", error);
-//     } finally {
-//       setLoading(false);
-//     }
-//   };
+  const navigateToRegister = () => {
+    navigate("/register");
+  };
+  const onFinish = async (email: string, password: string) => {
+    setLoading(true);
+    try {
+      await login(email, password);
 
+      if (inviteToken) {
+        try {
+          const res = await inviteUser();
+          const chatUuid = res.chat_uuid;
+          clearInviteIntent();
+          navigate(`/chat/${chatUuid}`);
+        } catch (err: any) {
+          const status = err?.response?.status;
+          switch (status) {
+            case 403:
+              toaster.create({
+                type: "error",
+                title:
+                  "Вы не тот пользователь, кому предназначалось приглашение в чат",
+              });
+              break;
+            case 409:
+              {
+                toaster.create({
+                  type: "info",
+                  title: "Вы уже участвуете в этом чате",
+                });
+                const chatUuid = err?.response?.data?.chat_uuid;
+                if (chatUuid) {
+                  navigate(`/chat/${chatUuid}`);
+                  clearInviteIntent();
+                  return;
+                }
+              }
+              break;
+            default:
+              toaster.create({
+                type: "error",
+                title: "Не удалось принять приглашение",
+              });
+          }
+          clearInviteIntent();
+          navigate("/chats");
+        }
+      } else {
+        navigate(fromPath);
+      }
+    } catch (err: any) {
+      console.error("Login error:", err);
+    } finally {
+      setLoading(false);
+    }
+  };
+  const navigateToMain = () => {
+    navigate("/");
+  };
   return (
-    <Fieldset.Root size="lg" maxW="md" as="form"
-    //  onSubmit={handleSubmit} 
-     mx="auto" my='auto' borderWidth={2} p={10} borderRadius={15} boxShadow={'lg'}>
-      <Stack >
+    <Fieldset.Root
+      size="lg"
+      maxW="md"
+      as="form"
+      mx="auto"
+      my="auto"
+      borderWidth={2}
+      p={10}
+      borderRadius={15}
+      boxShadow={"lg"}
+    >
+      <Stack>
         <Fieldset.Legend>Вход в Chat Platform</Fieldset.Legend>
-        <Fieldset.HelperText>Пожалуйста, введите свои учетные данные.</Fieldset.HelperText>
+        <Fieldset.HelperText>
+          Пожалуйста, введите свои учетные данные.
+        </Fieldset.HelperText>
       </Stack>
 
       {/* {error && (
@@ -56,13 +118,12 @@ const [username, setUsername] = useState('');
 
       <Fieldset.Content>
         <Field.Root>
-          <Field.Label htmlFor="username">Имя пользователя</Field.Label>
+          <Field.Label htmlFor="username">Почта</Field.Label>
           <Input
-            name="username"
+            name="email"
             size="lg"
             borderColor="gray.600"
-            // value={username}
-            // onChange={(e) => setUsername(e.target.value)}
+            onChange={(e) => setEmail(e.target.value)}
           />
         </Field.Root>
 
@@ -73,8 +134,7 @@ const [username, setUsername] = useState('');
             type="password"
             size="lg"
             borderColor="gray.600"
-            // value={password}
-            // onChange={(e) => setPassword(e.target.value)}
+            onChange={(e) => setPassword(e.target.value)}
           />
           <Field.ErrorText>Введите пароль</Field.ErrorText>
         </Field.Root>
@@ -89,23 +149,18 @@ const [username, setUsername] = useState('');
         bg="blue"
         borderRadius={20}
         mb={5}
+        onClick={() => onFinish(email, password)}
       >
         Войти
       </Button>
-
-      <Text mt={4} color="gray.400" > 
-        Еще нет аккаунта?{'      '}
-        <ChakraLink 
-        // as={Link} to="/register" 
-        color="blue.600">
+      <Text mt={4} color="gray.400">
+        Еще нет аккаунта?{"      "}
+        <ChakraLink onClick={navigateToRegister} color="blue.600">
           Зарегистрироваться
         </ChakraLink>
       </Text>
-
       <Text mt={2} color="gray.400">
-        <ChakraLink 
-        // as={Link} to="/welcome" 
-        color="blue.600">
+        <ChakraLink onClick={navigateToMain} color="blue.600">
           Вернуться на главную
         </ChakraLink>
       </Text>

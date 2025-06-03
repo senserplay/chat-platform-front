@@ -5,4 +5,9 @@ import tsconfigPaths from 'vite-tsconfig-paths';
 // https://vite.dev/config/
 export default defineConfig({
   plugins: [react(), tsconfigPaths()],
+  server: {
+    host: '0.0.0.0', // <-- важно!
+    port: 5173,
+    allowedHosts: ['chat-platform.amurushkin.ru'], // ✅ Разрешаем этот хост
+  },
 })

@@ -1,13 +1,9 @@
-import {
-  Flex,
-  Box,
-  Heading,
-  Text,
-  HStack,
-  Button,
-} from "@chakra-ui/react";
+import { LocationState } from "@/entities/Invite";
+import { useAuth } from "@/shared/contexts/AuthContext";
+import { Flex, Box, Heading, Text, HStack, Button } from "@chakra-ui/react";
 import { keyframes } from "@emotion/react";
-import { useNavigate } from "react-router-dom";
+import { useEffect } from "react";
+import { useLocation, useNavigate } from "react-router-dom";
 
 const fadeIn = keyframes`
   from { opacity: 0; transform: translateY(20px); }
@@ -15,12 +11,37 @@ const fadeIn = keyframes`
 `;
 
 const MainPage = () => {
-    const navigate=useNavigate();
-    const navigateToLogin=()=>{
-        navigate('/login')
+  const auth = useAuth();
+  const isAuthenticated = auth.isAuthenticated;
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    console.log('захожу в проверку авторизации');
+    
+    if (isAuthenticated) {
+      navigate("/chats", { replace: true });
+      console.log('пользователь авторизирован');
+
     }
+  }, [isAuthenticated, navigate]);
+  const location = useLocation();
+  const { from } = (location.state as LocationState) || {};
+  const fromPath = from?.pathname ?? "/";
+
+  const navigateToLogin = () => {
+    navigate("/login", { state: { from: fromPath } });
+  };
+  const navigateToRegister = () => {
+    navigate("/register", { state: { from: fromPath } });
+  };
   return (
-    <Flex direction="column" justifyContent={'center'} align="center" p={{ base: "20px", md: "40px" }} h={'100vh'}>
+    <Flex
+      direction="column"
+      justifyContent={"center"}
+      align="center"
+      p={{ base: "20px", md: "40px" }}
+      h={"100vh"}
+    >
       <Box
         textAlign="center"
         mb="60px"
@@ -63,7 +84,7 @@ const MainPage = () => {
             bg="blue"
             borderRadius={30}
             _hover={{ bg: "blue/80" }}
-            onClick={navigateToLogin}
+            onClick={navigateToRegister}
           >
             Начать
           </Button>
@@ -76,6 +97,7 @@ const MainPage = () => {
             variant="outline"
             _hover={{ bg: "blue/5" }}
             borderRadius={30}
+            onClick={navigateToLogin}
           >
             У меня уже есть аккаунт
           </Button>
