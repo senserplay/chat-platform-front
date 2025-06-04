@@ -28,7 +28,8 @@ export const ChatId = () => {
     isErrorUser
   )
     return <LoaderSpinner />;
-
+  const isOwner=responseUser?.id === data.owner_id;
+  const userMe=responseUser.id;
   return (
     <HStack minW={"100%"} alignItems={"start"} justifyContent={"center"}>
       <VStack w={"100%"} h={"100%"}>
@@ -38,7 +39,7 @@ export const ChatId = () => {
               {data.title}
             </Text>
           </Flex>
-          {responseUser?.id === data.owner_id && (
+          {isOwner && (
             <InviteModal chat_uuid={chat_uuid} />
           )}
         </HStack>
@@ -58,14 +59,14 @@ export const ChatId = () => {
               borderTop="1px solid"
               borderColor="gray.200"
             >
-              <InputPostMessage chat_uuid={chat_uuid} />
+              <InputPostMessage chat_uuid={chat_uuid}/>
             </Flex>
           ) : (
             <></>
           )}
         </VStack>
       </VStack>
-      <UserList chat_uuid={chat_uuid}/>
+      <UserList chat_uuid={chat_uuid} isOwner={isOwner} userMe={userMe}/>
     </HStack>
   );
 };
