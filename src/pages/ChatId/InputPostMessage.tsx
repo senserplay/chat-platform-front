@@ -11,26 +11,35 @@ export const InputPostMessage = ({ chat_uuid }: MessageChatProps) => {
   const queryClient = useQueryClient();
 
   const postMessage = async () => {
+    if (text.trim()==='')return;
     try {
       await postNewMessage({ chat_uuid, text });
-      await queryClient.invalidateQueries({ queryKey: ["getMessageChat", chat_uuid] });
+      await queryClient.invalidateQueries({
+        queryKey: ["getMessageChat", chat_uuid],
+      });
       console.log("создали сообщение");
-      setText('')
+      setText("");
     } catch (err) {
       console.error("ошибка отправки сообщения", err);
     }
   };
   return (
-    <HStack w={'100%'}>
-    <Textarea
-        placeholder="Введите сообщение" 
+    <HStack w={"100%"}>
+      <Textarea
+        placeholder="Введите сообщение"
         value={text}
-        autoresize 
+        autoresize
         onChange={(e) => setText(e.target.value)}
-        resize="vertical"      
-        minH="50px"           
-        maxH="200px"           
-      /><FaCircleArrowRight cursor={'pointer'} size="32px" color="blue" onClick={()=>postMessage()}/></HStack>
-
+        resize="vertical"
+        minH="50px"
+        maxH="200px"
+      />
+      <FaCircleArrowRight
+        cursor={"pointer"}
+        size="32px"
+        color="blue"
+        onClick={() => postMessage()}
+      />
+    </HStack>
   );
 };
