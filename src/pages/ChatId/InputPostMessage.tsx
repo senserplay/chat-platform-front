@@ -11,6 +11,7 @@ export const InputPostMessage = ({ chat_uuid }: MessageChatProps) => {
   const queryClient = useQueryClient();
 
   const postMessage = async () => {
+    if (text.trim()==='')return;
     try {
       await postNewMessage({ chat_uuid, text });
       await queryClient.invalidateQueries({
